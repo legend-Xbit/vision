@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --color-x-bg: #000000;
+  --color-x-border: #2f3336;
+  --color-x-text: #e7e9ea;
+  --color-x-muted: #71767b;
+  --color-x-accent: #1d9bf0;
+  --color-x-like: #f91880;
+  --color-x-hover: rgba(255, 255, 255, 0.03);
+  --color-x-card-hover: rgba(255, 255, 255, 0.03);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #000000;
+  color: #e7e9ea;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+* {
+  box-sizing: border-box;
+}
