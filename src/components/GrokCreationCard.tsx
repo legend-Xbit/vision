@@ -113,9 +113,17 @@ export function GrokCreationCard({
   creation,
   onRemix,
   onPlay,
+  onToggleLike,
+  onToggleRepost,
+  onToggleBookmark,
+  onShare,
+  onViewDetails,
 }: GrokCreationCardProps) {
-  const { author, engagement } = creation
+  const { author, engagement, userInteractions } = creation
   const isGame = creation.type === 'game' || creation.hasPlay
+  const isLiked = !!userInteractions?.liked
+  const isReposted = !!userInteractions?.reposted
+  const isBookmarked = !!userInteractions?.bookmarked
 
   return (
     <article className="group border-b border-x-border px-4 py-3 transition-colors hover:bg-x-card-hover">
@@ -123,7 +131,7 @@ export function GrokCreationCard({
         {/* Avatar */}
         <div className="shrink-0">
           <div
-            className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white shadow-sm"
             style={{
               background:
                 author.avatarGradient ??
@@ -156,7 +164,19 @@ export function GrokCreationCard({
           )}
 
           {/* Rich card */}
-          <div className="mt-3 overflow-hidden rounded-2xl border border-x-border">
+          <div
+            onClick={() => onViewDetails?.(creation)}
+            className="mt-3 cursor-pointer overflow-hidden rounded-2xl border border-x-border transition hover:border-x-muted/60"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onViewDetails?.(creation)
+              }
+            }}
+            aria-label={`عرض تفاصيل ${creation.title}`}
+          >
             {/* Cover / media */}
             <div
               className="relative flex h-44 items-center justify-center sm:h-52"
@@ -166,7 +186,10 @@ export function GrokCreationCard({
               {isGame && (
                 <button
                   type="button"
-                  onClick={() => onPlay?.(creation)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onPlay?.(creation)
+                  }}
                   className="relative z-10 flex items-center gap-2 rounded-full bg-white/95 px-5 py-2.5 text-sm font-bold text-black shadow-lg transition hover:scale-105 hover:bg-white active:scale-100"
                 >
                   <IconPlay className="h-5 w-5" />
@@ -192,21 +215,21 @@ export function GrokCreationCard({
                   grok.me/{creation.slug}
                 </span>
               </div>
-              <h3 className="text-[17px] font-bold leading-snug text-x-text">
+              <h3 className="text-[17px] font-bold leading-snug text-x-text group-hover:text-x-accent transition-colors">
                 {creation.title}
               </h3>
-              <p className="text-[14px] leading-5 text-x-muted">
+              <p className="text-[14px] leading-5 text-x-muted line-clamp-2">
                 {creation.description}
               </p>
             </div>
           </div>
 
           {/* Remix CTA */}
-          <div className="mt-3">
+          <div className="mt-3 flex items-center gap-2">
             <button
               type="button"
               onClick={() => onRemix?.(creation)}
-              className="inline-flex items-center gap-1.5 rounded-full border border-x-border px-3.5 py-1.5 text-[13px] font-semibold text-x-accent transition hover:bg-x-accent/10"
+              className="inline-flex items-center gap-1.5 rounded-full border border-x-border px-3.5 py-1.5 text-[13px] font-semibold text-x-accent transition hover:bg-x-accent/10 active:scale-95"
             >
               <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
                 <path
@@ -216,12 +239,21 @@ export function GrokCreationCard({
               </svg>
               أعد المزج مع Grok
             </button>
+            <button
+              type="button"
+              onClick={() => onViewDetails?.(creation)}
+              className="inline-flex items-center gap-1 rounded-full border border-x-border px-3 py-1.5 text-[13px] font-medium text-x-muted transition hover:bg-white/5 hover:text-x-text"
+            >
+              معاينة وتفاصيل
+            </button>
           </div>
 
           {/* Engagement footer */}
           <div className="mt-3 flex max-w-md items-center justify-between text-x-muted">
+            {/* Reply */}
             <button
               type="button"
+              onClick={() => onViewDetails?.(creation)}
               className="group/btn flex items-center gap-1 rounded-full transition hover:text-x-accent"
               aria-label={`${engagement.replies} ردود`}
             >
@@ -233,9 +265,13 @@ export function GrokCreationCard({
               </span>
             </button>
 
+            {/* Repost */}
             <button
               type="button"
-              className="group/btn flex items-center gap-1 rounded-full transition hover:text-emerald-400"
+              onClick={() => onToggleRepost?.(creation.id)}
+              className={`group/btn flex items-center gap-1 rounded-full transition hover:text-emerald-400 ${
+                isReposted ? 'text-emerald-400 font-semibold' : ''
+              }`}
               aria-label={`${engagement.reposts} إعادة نشر`}
             >
               <span className="rounded-full p-1.5 transition group-hover/btn:bg-emerald-400/10">
@@ -246,19 +282,28 @@ export function GrokCreationCard({
               </span>
             </button>
 
+            {/* Like */}
             <button
               type="button"
-              className="group/btn flex items-center gap-1 rounded-full transition hover:text-x-like"
+              onClick={() => onToggleLike?.(creation.id)}
+              className={`group/btn flex items-center gap-1 rounded-full transition hover:text-x-like ${
+                isLiked ? 'text-x-like font-semibold' : ''
+              }`}
               aria-label={`${engagement.likes} إعجاب`}
             >
               <span className="rounded-full p-1.5 transition group-hover/btn:bg-x-like/10">
-                <IconLike className="h-[18px] w-[18px]" />
+                <IconLike
+                  className={`h-[18px] w-[18px] transition-transform ${
+                    isLiked ? 'scale-110 fill-current' : ''
+                  }`}
+                />
               </span>
               <span className="text-[13px] tabular-nums">
                 {formatCount(engagement.likes)}
               </span>
             </button>
 
+            {/* Views */}
             <button
               type="button"
               className="group/btn flex items-center gap-1 rounded-full transition hover:text-x-accent"
@@ -272,11 +317,15 @@ export function GrokCreationCard({
               </span>
             </button>
 
+            {/* Actions: Bookmark & Share */}
             <div className="flex items-center">
               <button
                 type="button"
-                className="group/btn rounded-full transition hover:text-x-accent"
-                aria-label="إشارة مرجعية"
+                onClick={() => onToggleBookmark?.(creation.id)}
+                className={`group/btn rounded-full transition hover:text-x-accent ${
+                  isBookmarked ? 'text-x-accent' : ''
+                }`}
+                aria-label={isBookmarked ? 'إزالة من المحفوظات' : 'إشارة مرجعية'}
               >
                 <span className="inline-flex rounded-full p-1.5 transition group-hover/btn:bg-x-accent/10">
                   <IconBookmark className="h-[18px] w-[18px]" />
@@ -284,6 +333,7 @@ export function GrokCreationCard({
               </button>
               <button
                 type="button"
+                onClick={() => onShare?.(creation)}
                 className="group/btn rounded-full transition hover:text-x-accent"
                 aria-label="مشاركة"
               >
