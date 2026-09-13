@@ -12,16 +12,28 @@ const TYPE_PILLS: { id: CreationType | 'all'; label: string }[] = [
 export function CreatePromptBar({
   onBuild,
   placeholder = 'ماذا تريد أن يبني Grok؟',
+  initialPrompt,
+  onClearInitialPrompt,
 }: CreatePromptBarProps) {
-  const [prompt, setPrompt] = useState('')
+  const [internalPrompt, setInternalPrompt] = useState('')
   const [selectedType, setSelectedType] = useState<CreationType | 'all'>('all')
+
+  const prompt = initialPrompt !== undefined && initialPrompt !== '' ? initialPrompt : internalPrompt
+
+  function handlePromptChange(val: string) {
+    if (initialPrompt) {
+      onClearInitialPrompt?.()
+    }
+    setInternalPrompt(val)
+  }
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
     const trimmed = prompt.trim()
     if (!trimmed) return
     onBuild?.(trimmed, selectedType)
-    setPrompt('')
+    setInternalPrompt('')
+    onClearInitialPrompt?.()
   }
 
   return (
@@ -45,7 +57,7 @@ export function CreatePromptBar({
             id="grok-prompt"
             rows={2}
             value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
+            onChange={(e) => handlePromptChange(e.target.value)}
             placeholder={placeholder}
             className="w-full resize-none bg-transparent text-[20px] leading-6 text-x-text outline-none placeholder:text-x-muted"
           />

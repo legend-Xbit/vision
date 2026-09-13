@@ -19,6 +19,8 @@ npm run dev
 Then open the URL printed in the terminal (usually `http://localhost:5173`).
 
 ```bash
+npm run test    # تشغيل الاختبارات الآلية / run tests
+npm run lint    # فحص الكود / lint check
 npm run build   # إنتاج / production build
 npm run preview # معاينة البناء / preview the build
 ```
@@ -27,21 +29,25 @@ npm run preview # معاينة البناء / preview the build
 
 - Vite + React + TypeScript
 - Tailwind CSS v4 (`@tailwindcss/vite`)
-- بدون خادم خلفي — بيانات وهمية فقط / No backend — mock data only
+- Vitest + React Testing Library (للاختبارات)
+- LocalStorage للتخزين المحلي المستمر
 
 ## هيكل المشروع / Project structure
 
 ```
 src/
   components/
-    GrokCreationCard.tsx   # بطاقة إبداع بأسلوب X
-    GrokCreationsFeed.tsx  # الخط الزمني
-    CreatePromptBar.tsx    # شريط الإنشاء
+    GrokCreationCard.tsx        # بطاقة إبداع تفاعلية بأسلوب X
+    GrokCreationsFeed.tsx       # الخط الزمني مع التصفية والبحث
+    CreatePromptBar.tsx         # شريط الإنشاء وإعادة المزج
+    InteractivePreviewModal.tsx # نافذة المعاينة التفاعلية والتشغيل
   data/
-    mockCreations.ts       # بيانات تجريبية
-  types.ts                 # أنواع TypeScript
+    mockCreations.ts            # بيانات تجريبية
+  utils/
+    storage.ts                  # إدارة حفظ واسترجاع البيانات محلياً
+  types.ts                      # أنواع TypeScript
   App.tsx
-  index.css                # رموز تصميم X الداكنة
+  index.css                     # رموز تصميم X الداكنة
 ```
 
 ## المكوّنات والخصائص / Component props
